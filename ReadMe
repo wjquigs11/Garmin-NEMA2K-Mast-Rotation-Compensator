@@ -1,29 +1,11 @@
-NMEA 2000 Mast Rotation Compensator
+This repo is a fork of the original mast rotation compensator from RandelO, to enable the code to be used with Garmin wind instruments. The Garmin GNX Wind display does not allow user configuration of its N2K source, so if the GND10 (Nexus<>N2K translator) and the ESP32 (mast rotation corrector) are on the same network, the GNX Wind will always revert to the GND10 and ignore the corrected data.
 
-The goal of this project is to create a small, rugged and relatively inexpensive solution to providing mast rotation-compensated apparent wind angle information to NMEA200 instruments.
+Details page.
 
-A Honeywell Magnetic Position Sensor (https://sps.honeywell.com/us/en/products/advanced-sensing-technologies/aero-and-transportation-sensing/aero-and-transportation-sensors/motion-and-position-sensors/magnetic-position-sensors/arc) is used to measure the mast angle and translate it to a DC voltage. This sensor was chosen because of it's non-contact design, industrial design, and occasional availability on eBay at a deeply discounted price.
-
-The sensor output is scaled through a resistor divider so the max voltage will not exceed 3.3VDC.
-
-A Hat Labs ESP-32 development board (https://hatlabs.fi/product/sailor-hat-with-esp32) is used to house the divider and other peripherals. An ADS1115 ADC and 0.96" OLED display are connected to the processor via I2C.
-
-The processor reads the voltage from the divider, smooths the data, and scales it to populate a variable that corresponds to the mast rotation angle, from -50° to +50°.
-
-The processor parses incoming Apparent Wind Speed and Apparent Wind Angle data from the NME200 bus, and converts the angle data from radians to degrees.
-
-The incoming angle data is added to the mast rotation angle, converted back to radians, and re-transmitted on the NMEA2000 bus along with the wind speed.
-
-The Mast Rotation Compensator has it's own product code and ID, so instruments on the NMEA2000 network can select it as the source of AWS/AWD data.
-
-Notes:
-
-When uploading to the the Hat Labs board from the Arduino IDE, the board profile that worked for me is "DOIT ESP32 DEVKIT I", but only when I modified the upload speed to 115200.
-
-The Hat Labs board has SDA and SCL on pins other than 21 and 22.  I modified the board to use thise pins.
-
-My Honeywell sensor requires 24VDC for power.  I provided this with a small Murata DC-DC converter (https://www.mouser.com/ProductDetail/81-NMG1224SC) that I added to the Hat Labs board.
-
-My instruments include a Nexus wind instrument with a Garmin GND-10 black box bridge and multiple Raymarine i70s displays.
-
-I sail a Farrier F-32rx.
+Acknowledgements. 
+All of the people below provided support for this project and answered many annoying noob questions.
+randelO wrote the original code and figured out how to solve this problem initially for far less than the cost of a commercially-available rotation-compensated masthead wind instrument.
+ttlappalainen wrote the N2K libraries.
+mairas develops the Sailor Hat ESP32 hardware.
+buhhe got me started on parsing raw N2K data from the 2nd CAN bus.
+lkarsten wrote a library to parse Nexus FDX data from the masthead wind transducer.
