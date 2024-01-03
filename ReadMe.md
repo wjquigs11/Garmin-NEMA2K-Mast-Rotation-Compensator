@@ -1,5 +1,7 @@
 This repo is a fork of the original mast rotation compensator from RandelO, to enable the code to be used with Garmin wind instruments. The Garmin GNX Wind display does not allow user configuration of its N2K source, so if the GND10 (Nexus<>N2K translator) and the ESP32 (mast rotation corrector) are on the same network, the GNX Wind will always revert to the GND10 and ignore the corrected data.
 
+Start with the Readme here: https://github.com/randel0/NEMA2K-Mast-Rotation-Compensator
+
 Details page.
 
 Acknowledgements. 
