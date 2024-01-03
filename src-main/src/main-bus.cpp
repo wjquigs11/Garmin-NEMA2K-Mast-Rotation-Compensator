@@ -1,4 +1,8 @@
-// modified to read wind data from ESPlink (serial connection to SH)
+// 
+// this is https://github.com/hatlabs/SH-ESP32-nmea2000-gateway
+// modified (slightly) to read wind data from ESPlink (serial connection to SH-ESP)
+// I should add the Hat Labs repo as a submodule once I figure out how to do that
+//
 
 #include <Arduino.h>
 
@@ -18,7 +22,6 @@
 #include <Wire.h>
 #include <esp_int_wdt.h>
 #include <esp_task_wdt.h>
-
 #include "elapsedMillis.h"
 
 using namespace reactesp;
@@ -203,7 +206,7 @@ void setup() {
 
   nmea2000->SetForwardStream(forward_stream);
   nmea2000->SetMode(tNMEA2000::N2km_ListenAndNode);
-  //nmea2000->SetForwardType(tNMEA2000::fwdt_Text); // Show bus data in clear
+  //nmea2000->SetForwardType(tNMEA2000::fwdt_Text); // Show bus data in clear text
   nmea2000->SetForwardOwnMessages(true);
   nmea2000->SetMsgHandler(HandleStreamN2kMsg);
   nmea2000->Open();
