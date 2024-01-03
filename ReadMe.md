@@ -4,6 +4,7 @@ This ESP32 reads the corrected wind data from its serial port and forwards to th
 
 Start with the Readme here: https://github.com/randel0/NEMA2K-Mast-Rotation-Compensator
 I also recommend reading the Hat Labs documentation.
+If you just want to build and go, check out the QuickStart.md doc. If you're curious, check the FAQ.md.
 
 Acknowledgements. 
 All of the people below provided support for this project and answered many annoying questions.
