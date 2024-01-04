@@ -47,7 +47,7 @@ Adafruit_SSD1306 *display;
 tNMEA2000 *nmea2000;
 
 int num_n2k_messages = 0;
-//int num_actisense_messages = 0;
+int num_actisense_messages = 0;
 elapsedMillis time_since_last_can_rx = 0;
 
 // Time after which we should reboot if we haven't received any CAN messages
@@ -65,8 +65,9 @@ void HandleStreamN2kMsg(const tN2kMsg &message) {
   time_since_last_can_rx = 0;
   ToggleLed();
 }
-/*
+
 void HandleStreamActisenseMsg(const tN2kMsg &message) {
+/*
   //message.Print(&Serial);
   unsigned char SID;
   double windSpeedMetersSeconds;
@@ -83,12 +84,12 @@ void HandleStreamActisenseMsg(const tN2kMsg &message) {
     Serial.print(" degrees:");
     Serial.println(windAngleDegrees);
   }
-
+*/
   num_actisense_messages++;
   ToggleLed();
   nmea2000->SendMsg(message);
 }
-*/
+
 String can_state;
 
 void RecoverFromCANBusOff() {
@@ -130,7 +131,7 @@ void PollCANStatus() {
       break;
   }
 }
-
+/*
 typedef union {
   float floatP;
   byte binary[4];
@@ -143,7 +144,6 @@ void readSendESPwind() {
   // build N2K packet
   ESPlink.read(speed.binary,4);
   ESPlink.read(angle.binary,4);
-    /*
   Serial.print("speed: ");
   Serial.print(speed.floatP);
   Serial.print(" angle: ");
@@ -154,13 +154,12 @@ void readSendESPwind() {
   Serial.print(windSpeed);
   Serial.print(" angle: ");
   Serial.println(windAngle);
-  */
   angle.floatP *= (M_PI/180);
   tN2kMsg N2kMsg;
   SetN2kWindSpeed(N2kMsg, 1, speed.floatP, angle.floatP, N2kWind_Apparent);  
   nmea2000->SendMsg(N2kMsg);
 }
-
+*/
 void setup() {
   // setup serial output
   Serial.begin(115200);
@@ -259,12 +258,12 @@ void setup() {
     display->printf("CAN: %s\n", can_state.c_str());
     display->printf("Uptime: %lu\n", millis() / 1000);
     display->printf("RX: %d\n", num_n2k_messages);
-    //display->printf("TX: %d\n", num_actisense_messages);
+    display->printf("TX: %d\n", num_actisense_messages);
     display->display();
     Serial.print("uptime: ");
     Serial.println(millis() / 1000);
     num_n2k_messages = 0;
-    //num_actisense_messages = 0;
+    num_actisense_messages = 0;
   });
 }
 
