@@ -27,6 +27,7 @@ int PotHi=0;
 int RotationSensor::newValue{0};
 int RotationSensor::oldValue{0};
 
+// not sure if I need these any more since I'm doing it all in one function
 double WindSensor::windSpeedKnots{0.0};
 int WindSensor::windAngleDegrees{0};
 
@@ -42,8 +43,8 @@ void IRAM_ATTR NewDataReadyISR() {
   new_data = true;
 }
 
-int readAnalogRotationValue(){      //returns mastRotate value when called. This is in degrees, and corresponds to the current value of the Honeywell sensor
-
+// returns degrees, and corresponds to the current value of the Honeywell sensor
+int readAnalogRotationValue() {      
   // Define Constants
   const int lowset = 290;
   const int highset = 4095;
@@ -76,8 +77,7 @@ int readAnalogRotationValue(){      //returns mastRotate value when called. This
   return mastRotate; 
 }
 
-tN2kMsg correctN2kMsg;
-
+// only needed for raw data xmit
 typedef union {
   float floatP;
   byte binary[4];
@@ -87,45 +87,51 @@ binaryFloat speed, angle;
 
 void WindSpeed(const tN2kMsg &N2kMsg) {
   unsigned char SID;
-  char prbuf[PRBUF];
+  //char prbuf[PRBUF];
   double windSpeedMeters;
   double windSpeedKnots;
   double windAngleRadians;
   int windAngleDegrees;
   tN2kWindReference WindReference;
+  tN2kMsg correctN2kMsg; // can this be a local?
 
-    if (ParseN2kWindSpeed(N2kMsg,SID, windSpeedMeters, windAngleRadians, WindReference) ) {
-      windSpeedKnots =  windSpeedMeters * 1.943844; // convert m/s to kts
-      float windAngleDegrees = windAngleRadians * (180/M_PI);
-      WindSensor::windSpeedKnots = windSpeedKnots;
-      WindSensor::windAngleDegrees = windAngleDegrees;
-      Serial.print("windSpeedKnots: ");
-      Serial.print(windSpeedKnots);
-      Serial.print(" windangledegrees: ");
-      Serial.print(windAngleDegrees);
-      // read rotation value and correct
-      int mastRotate = readAnalogRotationValue();
-      Serial.print(" mastRotate: ");
-      Serial.print(mastRotate);
-      float anglesum = windAngleDegrees - mastRotate;
-      float rotateout=0.0;
-      if (anglesum<0) {                             //ensure sum is 0-359
-        rotateout = anglesum + 360;
-      } else if (anglesum>359) {   
-        rotateout = anglesum - 360;               
-      } else {
-        rotateout = anglesum;               
-      }
-      Serial.print(" rotateout: ");
-      Serial.println(rotateout);
-      speed.floatP = windSpeedKnots;
-      angle.floatP = rotateout;
-      ESPlink.write(speed.binary,4);
-      ESPlink.write(angle.binary,4);
-     }
-     
+  if (ParseN2kWindSpeed(N2kMsg,SID, windSpeedMeters, windAngleRadians, WindReference) ) {
+    windSpeedKnots =  windSpeedMeters * 1.943844; // convert m/s to kts
+    float windAngleDegrees = windAngleRadians * (180/M_PI);
+    WindSensor::windSpeedKnots = windSpeedKnots;
+    WindSensor::windAngleDegrees = windAngleDegrees;
+    Serial.print("windSpeedKnots: ");
+    Serial.print(windSpeedKnots);
+    Serial.print(" windangledegrees: ");
+    Serial.print(windAngleDegrees);
+    // read rotation value and correct
+    int mastRotate = readAnalogRotationValue();
+    Serial.print(" mastRotate: ");
+    Serial.print(mastRotate);
+    float anglesum = windAngleDegrees - mastRotate;
+    float rotateout=0.0;
+    if (anglesum<0) { // ensure sum is 0-359
+      rotateout = anglesum + 360; 
+    } else if (anglesum>359) {   
+      rotateout = anglesum - 360;               
+    } else {
+      rotateout = anglesum;               
+    }
+    Serial.print(" rotateout: ");
+    Serial.println(rotateout);
+    /* use this to send speed/angle directly on serial
+    speed.floatP = windSpeedKnots;
+    angle.floatP = rotateout;
+    ESPlink.write(speed.binary,4);
+    ESPlink.write(angle.binary,4);
+    */
+    // use this to send as Actisense
+    SetN2kWindSpeed(correctN2kMsg, 1, windSpeedMeters, rotateout*(M_PI/180), N2kWind_Apparent); 
+    //Stream *forward_stream = &ESPlink;
+    correctN2kMsg.SendInActisenseFormat((Stream *)&ESPlink);
+   } 
 }
-
+/*
 double ReadWindAngle(int rotateout) {
   return DegToRad(rotateout); // 
 }
@@ -137,7 +143,7 @@ double ReadWindSpeed() {
 int readWindAngleInput() {
   return  WindSensor::windAngleDegrees;
 }
-
+*/
 /*
 void SendN2kWind(int rotateout) {
   static unsigned long WindUpdated=millis();
