@@ -1,6 +1,9 @@
 FAQ
-1. Why use 2 ESP32s? Why not 2 CAN bus interfaces on a single ESP32?
+<ol>
+<li>Why use 2 ESP32s? Why not 2 CAN bus interfaces on a single ESP32?
 I tried for months to get a second interface working on the ESP32. The n2k_mcp driver is usually used with Arduino, Teensy and other microcontrollers because they don't have an internal CAN controller. Unfortunately, I could not get the mcp driver to work on the ESP32...it crashed the controller on initialization. And since this is such an incredibly specialized corner case and I don't have the expertise to debug FreeRTOS kernel panics, I didn't have a lot of options. Parsing the raw wind packets wasn't particularly complicated, but I was never able to get the MCP module to read valid data from the second CAN bus. I could see data on the bus, but it was garbage. I probably had some signal problem that again is beyond my ability to debug, and I'm not about to buy an oscilloscope. So I fell back on using a second ESP32 and forwarding the data over a serial link (using UART), which works fine and has the side effect of using the HAT Labs USB bridge code almost unmodified. And since @mairas is a much more qualified developer than I am, this is a good thing.
+</li>
+</ol>
 2. Do I need an external ADC?
 RandelO uses an ADS1015 ADC. I decided to use one of the internal ADCs on the ESP32. Either will work.
 3. What's the circuit on the Sailor HAT doing?
